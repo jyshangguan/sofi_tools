@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# My ignore
+data/vegallpr25.50000resam5
