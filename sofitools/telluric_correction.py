@@ -1,7 +1,7 @@
 import numpy as np
 from .utils import modulepath
 
-__all__ = ['spec_a0v', 'spec_vega', 'telluric_correction_A0V']
+__all__ = ['spec_a0v', 'spec_vega', 'telluric_correction_A0V', 'telluric_correction_B9V']
 
 
 def telluric_correction_A0V(wave, flux):
@@ -20,6 +20,31 @@ def telluric_correction_A0V(wave, flux):
         Telluric correction spectrum.
     '''
     telspec = spec_a0v
+    wave_tel = telspec['wave']
+    flux_tel = telspec['flux']
+    
+    flux_tel_interp = np.interp(wave, wave_tel, flux_tel)
+    tel_corr = flux_tel_interp / flux
+    tel_corr /= np.median(tel_corr)
+    return tel_corr
+    
+
+def telluric_correction_B9V(wave, flux):
+    '''
+    Calculate the telluric correction spectrum for an A0V standard star.
+    This is still a very preliminary method.
+    
+    Parameters
+    ----------
+    wave, flux : 1d array
+        Wavelength and flux of the standard star.
+    
+    Returns
+    -------
+    tel_corr : 1d array
+        Telluric correction spectrum.
+    '''
+    telspec = spec_b9v
     wave_tel = telspec['wave']
     flux_tel = telspec['flux']
     
@@ -56,6 +81,16 @@ spec_a0v = {
     'flux': flux,
     'flux_cont_m': flux_cont_m,
     'flux_norm': flux_norm
+}
+
+spec_b9v_pickles1998 = np.loadtxt('{}/Pickles1998_B9V.dat'.format(templatepath))
+spec_b9v_pickles1998[:, 0] /= 1e3  # Convert to micron
+fltr = (spec_b9v_pickles1998[:, 0] > 1.2) & (spec_b9v_pickles1998[:, 0] < 2.5)
+wave = spec_b9v_pickles1998[fltr, 0]
+flux = spec_b9v_pickles1998[fltr, 1]
+spec_b9v = {
+    'wave': wave,
+    'flux': flux,
 }
 
 

@@ -96,7 +96,7 @@ def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False):
         ax.plot(x + ncut, g(x), label='Fit')
         ax.axvspan(xmin=x0, xmax=x1, ls='--', fc='none', ec='C3', lw=lw, label='Extraction')
         ax.legend(loc='best', fontsize=16)
-        ax.set_ylabel('Intensity (??)', fontsize=24)
+        ax.set_ylabel('Intensity (ADU)', fontsize=24)
         ax.set_title('(b) Spatial collapsed', fontsize=24)
         ax.minorticks_on()
         
@@ -105,10 +105,8 @@ def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False):
         ax.plot(x, g(x), label='Fit')
         ax.axvspan(xmin=x0-ncut, xmax=x1-ncut, ls='--', fc='none', ec='C3', lw=lw, label='Extraction')
         ax.set_xlabel('Space (pixel)', fontsize=24)
-        ax.set_ylabel('Intensity (??)', fontsize=24)
+        ax.set_ylabel('Intensity (ADU)', fontsize=24)
         ax.set_title('(c) Spatial zoomed to fit', fontsize=24)
         ax.minorticks_on()
-        
-        plt.show()
         
     return x0, x1
