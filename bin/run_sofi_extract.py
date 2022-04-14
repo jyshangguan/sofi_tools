@@ -7,7 +7,6 @@ from astropy.nddata import CCDData
 from sofitools import run_reduction
 from sofitools import find_extract_box, get_wavelength_arc
 import argparse
-import matplotlib.pyplot as plt
 import matplotlib as mpl
 mpl.use('Agg')
 mpl.rc("xtick", direction="in", labelsize=16)
@@ -16,6 +15,7 @@ mpl.rc("xtick.major", width=1., size=8)
 mpl.rc("ytick.major", width=1., size=8)
 mpl.rc("xtick.minor", width=1., size=5)
 mpl.rc("ytick.minor", width=1., size=5)
+import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description='Extract 1D spectrum')
 parser.add_argument('--nstd', default=5, dest='nstd', type=float, 
@@ -67,10 +67,13 @@ for k_fltr in sciDict:
             ax1 = fig.add_axes([0.55, 0.65, 0.40, 0.2])
             ax2 = fig.add_axes([0.55, 0.40, 0.40, 0.2])
             ax3 = fig.add_axes([0.02, 0.04, 0.93, 0.3])
+            axs = (ax0, ax1, ax2)
+        else:
+            axs = None
                 
         res = find_extract_box(sci, nstd=args.nstd, ncut=args.ncut, 
-                                  std_init=args.std_init, plot=args.plot, 
-                                  axs=(ax0, ax1, ax2))
+                               std_init=args.std_init, plot=args.plot, 
+                               axs=axs)
         sci_spc1d = sci.data[:, res[0]:res[1]].sum(axis=1)
         
         c1 = fits.Column(name='Wavelength', format='Float64', unit='micron', array=wave)
