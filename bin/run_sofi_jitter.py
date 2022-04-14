@@ -17,7 +17,8 @@ if len(sciDict) == 0:
     raise RuntimeError('Cannot find any data!')
 else:
     print('#----------------------------')
-    print('# Find data in these filters: {}'.format(sciDict.keys()))
+    print('# Find data in these filters: {}'.format(list(sciDict.keys())))
+    print('#----------------------------\n')
 
 for k_fltr in sciDict:
     arcList = run_reduction.find_arc_reduced(work_path, k_fltr)
@@ -26,6 +27,11 @@ for k_fltr in sciDict:
     for tn in sciDict[k_fltr]:
         sciList = sciDict[k_fltr][tn]
         scisof = run_reduction.write_jitter_sof(sciList, arcList, flatList, work_path=work_path, calib_path=calib_path)
+        combined_name = '{0}_combined.fits'.format(scisof[:-4])
+        
+        if os.path.isfile(combined_name):
+            print('{}\n  File exists, skip the reduction...\n'.format(combined_name))
+            continue
         
         process = subprocess.Popen([esorex, recipes, 'sofi_spc_jitter', scisof], 
                                    stdout=subprocess.PIPE,
@@ -43,8 +49,7 @@ for k_fltr in sciDict:
                     print(output.strip())
                 break
         
-        process = subprocess.Popen(['mv', '{}/sofi_spc_jitter_combined.fits'.format(work_path), 
-                                    '{0}_combined.fits'.format(scisof[:-4])],
+        process = subprocess.Popen(['mv', '{}/sofi_spc_jitter_combined.fits'.format(work_path), combined_name],
                      stdout=subprocess.PIPE, 
                      stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
