@@ -9,11 +9,12 @@ work_path = './'
 pipe_path = os.environ['SOFIPIPELINE']
 calib_path = '{}/calib/sofi-1.5.13'.format(pipe_path)
 esorex = '{}/bin/esorex'.format(pipe_path)
+recipes = '--recipe-dir={}/lib/esopipes-plugins'.format(pipe_path)
 
 arcList = run_reduction.find_arc_raw(work_path)
 arcsof = run_reduction.write_arc_sof(arcList, work_path=work_path, calib_path=calib_path)
 
-process = subprocess.Popen([esorex, 'sofi_spc_arc', 'arc.sof'], 
+process = subprocess.Popen([esorex, recipes, 'sofi_spc_arc', 'arc.sof'], 
                            stdout=subprocess.PIPE,
                            universal_newlines=True)
 
