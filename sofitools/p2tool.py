@@ -1,5 +1,9 @@
 import numpy as np
 from datetime import datetime
+from astropy.time import Time
+from astropy import units as u
+from astropy.coordinates import CIRS, GCRS
+from astropy.coordinates import SkyCoord, Distance
 import p2api
 
 now = datetime.now()
@@ -537,7 +541,27 @@ class p2api_SOFI(object):
         return odict[name]
     
     
-    def set_rootContainterId(self, root_container_id):
+    def set_rootFolder(self, name, no_warning=False):
+        '''
+        Set a root folder and work on it.
+        '''
+        api = self.api
+        containerId = self._runContainerId
+        
+        items = api.getItems(containerId)[0]
+        fd = None
+        for it in items:
+            if (it['itemType'] == 'Folder') & (it['name'] == name):
+                fd, fdV = api.getContainer(it['containerId'])
+                self.rootDict['Root'] = [fd, fdV]
+        
+        if fd is None:
+            raise Exception('Cannot find a folder named {}!'.format(name))
+        else:
+            self.set_rootContainterId(fd['containerId'], no_warning)
+        
+    
+    def set_rootContainterId(self, root_container_id, no_warning=False):
         '''
         Set the rootContainterId.
         
@@ -547,10 +571,10 @@ class p2api_SOFI(object):
             ID of the root container.
         '''
         self._rootContainterId = root_container_id
-        self.update_content()
+        self.update_content(no_warning)
     
     
-    def update_content(self):
+    def update_content(self, no_warning=False):
         '''
         Update the content of this run.
         '''
@@ -581,6 +605,102 @@ class p2api_SOFI(object):
                         folder['OBs'][it_in_folder['name']] = api.getOB(it_in_folder['obId'])
             else:
                 raise KeyError('Cannot recognize this type ({})!'.format(it['itemType']))
+
+
+def read_coordinate(ra, dec):
+    '''
+    Read in the coordinate, either in degree or hourangle. Only use ICRS frame.
+    
+    Parameters
+    ----------
+    ra : float or string
+        The right ascension (degree or HH:MM:SS).
+    dec : float or string
+        The declination (degree or DD:MM:SS).
+    
+    Returns
+    -------
+    c : SkyCoord
+        The coordinate object.
+    '''
+    if isinstance(ra, str):
+        assert isinstance(dec, str)
+        c = SkyCoord('{0} {1}'.format(ra, dec), frame='icrs', unit=(u.hourangle, u.deg))
+    else:
+        c = SkyCoord(ra, dec, frame='icrs', unit='deg')
+    return c
+    
+    
+def cal_coord_motion(c, pma=None, pmd=None, plx=None, radvel=None,
+                     time_ref='J2000.0', time_cal='now', frame=GCRS):
+    """
+    Calculate the current coordinates considering the motion of the source.
+
+    Parameters
+    ----------
+    c : Astropy SkyCoord
+        The coordinate to calculate the motion.
+    pma (optional) : Astropy Quantity (angular velocity)
+        The proper motion of RA.
+    pmd (optional) : Astropy Quantity (angular velocity)
+        The proper motion of DEC.
+    plx (optional) : Astropy Quantity (angle)
+        The parallex.
+    radvel (optional) : Astropy Quantity (velocity)
+        The radial velocity.
+    time_ref : string (default: 'J2000.0')
+        The reference time of the input data.
+    time_cal : string (default: 'now')
+        The time to calculate the motion of the coordinate.
+    frame : coordinate systems (default: GCRS)
+        The coordinate system, which need to consider the orbit of the Earth
+        around the Sun.
+
+    Returns
+    -------
+    c_c : Astropy SkyCoord
+        The calculated coordinate.
+    """
+    if pma is None:
+        pma = 1e-16*u.mas/u.yr
+    if pmd is None:
+        pmd = 1e-16*u.mas/u.yr
+    if plx is None:
+        plx = 0 * u.mas
+    if radvel is None:
+        radvel = 0 * u.km/u.s
+    c_m = SkyCoord(ra=c.ra, dec=c.dec, pm_ra_cosdec=pma, pm_dec=pmd,
+                   distance=Distance(parallax=plx), radial_velocity=radvel,
+                   frame=c.frame.name, obstime=time_ref)
+    if time_cal == 'now':
+        time_cal = Time.now()
+    else:
+        time_cal = Time(time_cal)
+    c_c = c_m.apply_space_motion(time_cal).transform_to(GCRS(obstime=time_cal))
+    return c_c
+
+
+def cal_offset(c, c_ref):
+    """
+    Calculate the coordinate offset betweenn the two coordinates.
+
+    Parameters
+    ----------
+    c : Astropy SkyCoord
+        The coordinate to calculate the offset.
+    c_ref : Astropy SkyCoord
+        The reference coordinate.
+
+    Returns
+    -------
+    (delta_ra, delta_dec) : (float, float)
+        The offsets of right ascension and declination, units: arcsec.
+    """
+    sep = c_ref.separation(c)
+    pa = c_ref.position_angle(c)
+    delta_ra = (sep * np.sin(pa)).to('arcsec').value
+    delta_dec = (sep * np.cos(pa)).to('arcsec').value
+    return (delta_ra, delta_dec)
     
     
 def spec_params(Kagn):
