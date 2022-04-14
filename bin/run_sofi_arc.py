@@ -4,7 +4,6 @@ from astropy.io import fits
 from glob import glob
 import subprocess
 from sofitools import run_reduction
-from pathlib import Path
 
 work_path = './'
 pipe_path = os.environ['SOFIPIPELINE']
