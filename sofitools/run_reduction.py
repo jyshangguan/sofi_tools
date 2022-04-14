@@ -105,7 +105,30 @@ def find_flat_reduced(work_path, filter):
         if (procatg == 'MASTER_SP_FLAT') & (fltname == filter):
             flatList.append(f)
     return flatList
+
+
+def find_science_combined(work_path):
+    '''
+    Find the reduced science data.
+    '''
+    if not os.path.isabs(work_path):
+        work_path = '{0}/{1}'.format(cwd, work_path)
+    fList = sorted(glob('{}/*.fits'.format(work_path)))
     
+    sciDict = {}
+    for f in fList:
+        header = fits.getheader(f, ext=0)
+        procatg = header.get('ESO PRO CATG')
+        fltname =  header.get('ESO INS FILT1 NAME')
+        assert fltname is not None, 'The filter is wrong??'
+        
+        if (procatg == 'OBS_COMBINED'):
+            if fltname in sciDict:
+                sciDict[fltname].append(f)
+            else:
+                sciDict[fltname] = [f]
+    return sciDict
+        
 
 def write_arc_sof(file_list, work_path, calib_path):
     '''

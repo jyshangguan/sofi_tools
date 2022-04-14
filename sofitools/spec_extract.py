@@ -31,7 +31,7 @@ def get_wavelength_arc(filename, npix=1024):
     return wave
 
 
-def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False):
+def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False, axs=None):
     '''
     Find the extracting box boundaries.
     
@@ -72,11 +72,14 @@ def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False):
     x0, x1 = int(np.floor(mean - nstd * std)), int(np.ceil(mean + nstd * std))
     
     if plot:
-        #fig, axs = plt.subplots(2, 1, figsize=(8, 8))
-        fig = plt.figure(figsize=(16, 8))
-        ax0 = fig.add_axes([0.025, 0.05, 0.45, 0.9])
-        ax1 = fig.add_axes([0.55, 0.55, 0.40, 0.40])
-        ax2 = fig.add_axes([0.55, 0.05, 0.40, 0.40])
+        if axs is None:
+            fig = plt.figure(figsize=(16, 8))
+            ax0 = fig.add_axes([0.025, 0.05, 0.45, 0.9])
+            ax1 = fig.add_axes([0.55, 0.55, 0.40, 0.40])
+            ax2 = fig.add_axes([0.55, 0.05, 0.40, 0.40])
+            axs = [ax0, ax1, ax2]
+        else:
+            ax0, ax1, ax2 = axs
         lw = 2
         
         # Plot the 2D spectrum
@@ -108,5 +111,6 @@ def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False):
         ax.set_ylabel('Intensity (ADU)', fontsize=24)
         ax.set_title('(c) Spatial zoomed to fit', fontsize=24)
         ax.minorticks_on()
+        return x0, x1, axs
         
     return x0, x1
