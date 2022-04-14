@@ -1,7 +1,7 @@
 export SOFITOOLS=/Users/shangguan/Softwares/my_module/sofi_tools
+export SOFIPIPELINE=/Users/shangguan/Softwares/sofi-pipeline
 export PYTHONPATH=$PYTHONPATH:$SOFITOOLS
-export PATH=/Users/shangguan/Softwares/sofi-pipeline/bin:$PATH
-export SOFICALIB=/Users/shangguan/Softwares/sofi-pipeline/calib/sofi-1.5.13
+
 alias run_sofi_arc='python $SOFITOOLS/bin/run_sofi_arc.py'
 alias run_sofi_flat='python $SOFITOOLS/bin/run_sofi_flat.py'
 alias run_sofi_jitter='python $SOFITOOLS/bin/run_sofi_jitter.py'

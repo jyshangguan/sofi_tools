@@ -7,7 +7,9 @@ from sofitools import run_reduction
 from pathlib import Path
 
 work_path = './'
-calib_path = os.environ['SOFICALIB']
+pipe_path = os.environ['SOFIPIPELINE']
+calib_path = '{}/calib/sofi-1.5.13'.format(pipe_path)
+esorex = '{}/bin/esorex'.format(pipe_path)
 
 sciDict = run_reduction.find_science_raw(work_path)
 
@@ -25,7 +27,7 @@ for k_fltr in sciDict:
         sciList = sciDict[k_fltr][tn]
         scisof = run_reduction.write_jitter_sof(sciList, arcList, flatList, work_path=work_path, calib_path=calib_path)
         
-        process = subprocess.Popen(['esorex', 'sofi_spc_jitter', scisof], 
+        process = subprocess.Popen([esorex, 'sofi_spc_jitter', scisof], 
                                    stdout=subprocess.PIPE,
                                    universal_newlines=True)
         
