@@ -18,14 +18,14 @@ mpl.rc("ytick.minor", width=1., size=5)
 import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description='Extract 1D spectrum')
-parser.add_argument('--nstd', default=5, dest='nstd', type=float, 
+parser.add_argument('-w', '--nstd', default=5, dest='nstd', type=float, 
                     help='Extraction box (half) width')
-parser.add_argument('--ncut', default=20, dest='ncut', type=int, 
+parser.add_argument('-c', '--ncut', default=20, dest='ncut', type=int, 
                     help='Cut the edges of the detector')
-parser.add_argument('--std_init', default=10, dest='std_init', type=float, 
+parser.add_argument('-i', '--std_init', default=10, dest='std_init', type=float, 
                     help='Initial guess of the Gaussian fitting')
-parser.add_argument('--plot', default=False, dest='plot', type=bool, 
-                    help='Plot the extraction details if True')
+parser.add_argument('-p', '--plot', default=False, dest='plot', 
+                    action='store_true', help='Plot the extraction details if True')
 args = parser.parse_args()
 
 
