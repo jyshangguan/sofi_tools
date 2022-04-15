@@ -1,12 +1,3 @@
-import os
-import numpy as np
-from astropy.io import fits
-from glob import glob
-import subprocess
-from astropy.nddata import CCDData
-from sofitools import run_reduction
-from sofitools import find_extract_box, get_wavelength_arc
-import argparse
 import matplotlib as mpl
 mpl.use('Agg')
 mpl.rc("xtick", direction="in", labelsize=16)
@@ -16,6 +7,16 @@ mpl.rc("ytick.major", width=1., size=8)
 mpl.rc("xtick.minor", width=1., size=5)
 mpl.rc("ytick.minor", width=1., size=5)
 import matplotlib.pyplot as plt
+
+import os
+import numpy as np
+from astropy.io import fits
+from glob import glob
+import subprocess
+from astropy.nddata import CCDData
+from sofitools import run_reduction
+from sofitools import find_extract_box, get_wavelength_arc
+import argparse
 
 parser = argparse.ArgumentParser(description='Extract 1D spectrum')
 parser.add_argument('-w', '--nstd', default=5, dest='nstd', type=float, 
