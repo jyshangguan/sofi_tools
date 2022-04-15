@@ -612,6 +612,13 @@ class p2api_SOFI(object):
                 raise KeyError('Cannot recognize this type ({})!'.format(it['itemType']))
 
 
+    def verifyOB(self, ob):
+        '''
+        Verify OB.
+        '''
+        self.api.verifyOB(ob['obId'], True)
+        
+
 def search_simbad(name):
     '''
     Find the target name from Simbad.
@@ -677,6 +684,7 @@ def create_OB_telluric(name, sofi, folder_name='tmp', dit_acq=10, ndit_acq=1, di
     
     sofi.add_SOFI_img_acq_MoveToSlit(ob_name, folder_name=folder_name, dit=dit_acq, ndit=ndit_acq, save=save)
     sofi.add_SOFI_spec_obs_AutoNodNonDestr(ob_name, folder_name=folder_name, dit=dit, ndit=ndit, nint=1, nabcycles=1)
+    sofi.verifyOB(ob)
     
 
 def read_coordinate(ra, dec):

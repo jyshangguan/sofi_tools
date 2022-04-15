@@ -6,4 +6,6 @@ alias run_sofi_arc='python $SOFITOOLS/bin/run_sofi_arc.py'
 alias run_sofi_flat='python $SOFITOOLS/bin/run_sofi_flat.py'
 alias run_sofi_jitter='python $SOFITOOLS/bin/run_sofi_jitter.py'
 alias run_sofi_extract='python $SOFITOOLS/bin/run_sofi_extract.py'
+alias gen_sofi_telluric='python $SOFITOOLS/bin/gen_sofi_telluric.py'
+
 alias sofi_dfits='dfits *.fits | fitsort obs.targ.name dpr.type dpr.catg pro.catg ins.filt1.name'
