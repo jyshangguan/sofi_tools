@@ -642,7 +642,7 @@ def search_simbad(name):
     return ra_hms, dec_dms, pma, pmd
     
     
-def create_OB_telluric(name, folder_name, sofi, dit_acq=10, ndit_acq=1, dit=10, ndit=1, save=True):
+def create_OB_telluric(name, sofi, folder_name='tmp', dit_acq=10, ndit_acq=1, dit=10, ndit=1, save=True):
     '''
     Create an OB for the telluric star.
     
@@ -650,9 +650,9 @@ def create_OB_telluric(name, folder_name, sofi, dit_acq=10, ndit_acq=1, dit=10, 
     ----------
     name : str
         Name of the telluric star.
-    folder_name : str
-        Name of the folder to save the OB.
     sofi : p2api_SOFI
+    folder_name : str (default: tmp)
+        Name of the folder to save the OB.
     dit_acq : float (default: 10)
     ndit_acq : float (default: 1)
     dit : float (default: 10)
