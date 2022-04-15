@@ -5,12 +5,14 @@ from astropy import units as u
 from astropy.coordinates import CIRS, GCRS
 from astropy.coordinates import SkyCoord, Distance
 import p2api
+from astroquery.simbad import Simbad
+Simbad.add_votable_fields('pmra', 'pmdec', 'rv_value', 'sptype', 'otype')
 
 now = datetime.now()
 dt_string = now.strftime("%Y-%m-%dT%H:%M:%S")
 
 all = ['check_item_exist', 'create_OB', 'ob_add_target', 'ob_add_description', 
-       'p2api_SOFI']
+       'p2api_SOFI', 'search_simbad', 'create_OB_telluric']
 
 
 def check_item_exist(name, itemType, runContainerId, api):
@@ -424,7 +426,10 @@ class p2api_SOFI(object):
             Overwrite the existing OB if True.
         '''
         api = self.api
-        folder, folderVersion = self.get_folder(folder_name)
+        try:
+            folder, folderVersion = self.get_folder(folder_name)
+        except AssertionError:
+            folder, folderVersion = self.create_folder(folder_name)
         containerId = folder['containerId']
         
         odict = folder.get('OBs', None)
@@ -496,13 +501,13 @@ class p2api_SOFI(object):
             api.deleteContainer(folder_id, fdV)
 
     
-    def get_folder(self, folder_name):
+    def get_folder(self, folder_name=None):
         '''
         Get the folder information.
         
         Parameters
         ----------
-        folder_name : string 
+        folder_name (optional) : string 
             Folder name.
         '''
         if folder_name is None:
@@ -607,6 +612,73 @@ class p2api_SOFI(object):
                 raise KeyError('Cannot recognize this type ({})!'.format(it['itemType']))
 
 
+def search_simbad(name):
+    '''
+    Find the target name from Simbad.
+    
+    Parameters
+    ----------
+    name : str
+        Name of the target.
+    
+    Returns
+    -------
+    ra_hms, dec_hms  : str
+        Coordinates, (HH:MM:SS, DD:MM:SS).
+    pma, pmd : str
+        Proper motion, units: arcsec / year
+    '''
+    result_table = Simbad.query_object(name)
+    
+    if result_table is None:
+        raise Exception('The target ({}) is not found!'.format(name))
+    
+    ra = result_table['RA'][0]
+    dec = result_table['DEC'][0]
+    pma = result_table['PMRA'][0] * 1e-3
+    pmd = result_table['PMDEC'][0] * 1e-3
+    c = read_coordinate(ra, dec)
+    ra_hms, dec_dms = get_coord_colon(c)
+    return ra_hms, dec_dms, pma, pmd
+    
+    
+def create_OB_telluric(name, folder_name, sofi, dit_acq=10, ndit_acq=1, dit=10, ndit=1, save=True):
+    '''
+    Create an OB for the telluric star.
+    
+    Parameters
+    ----------
+    name : str
+        Name of the telluric star.
+    folder_name : str
+        Name of the folder to save the OB.
+    sofi : p2api_SOFI
+    dit_acq : float (default: 10)
+    ndit_acq : float (default: 1)
+    dit : float (default: 10)
+    ndit : float (default: 1)
+    save : bool (default: True)
+    '''
+    ra, dec, pma, pmd = search_simbad(name)
+    
+    tell_name = name.replace(' ', '_')
+    ob_name = 'telluric_{}'.format(tell_name)
+    ob, obVersion = sofi.create_OB(ob_name, folder_name=folder_name, overwrite=True)
+    target = ob['target']
+    target['name'] = name
+    target['ra'] = ra
+    target['dec'] = dec
+    target['properMotionRa'] = pma
+    target['properMotionDec'] = pmd
+    obsDes = ob['obsDescription']
+    obsDes['name'] = name
+    obsDes['userComments'] = 'Telluric star for {}'.format(folder_name)
+    ob, obV = sofi.save_OB(ob_name, folder_name=folder_name)
+    
+    sofi.add_SOFI_img_acq_MoveToSlit(ob_name, folder_name=folder_name, dit=dit_acq, ndit=ndit_acq, save=save)
+    sofi.add_SOFI_spec_obs_AutoNodNonDestr(ob_name, folder_name=folder_name, dit=dit, ndit=ndit, nint=1, nabcycles=1)
+    
+
 def read_coordinate(ra, dec):
     '''
     Read in the coordinate, either in degree or hourangle. Only use ICRS frame.
@@ -701,6 +773,35 @@ def cal_offset(c, c_ref):
     delta_ra = (sep * np.sin(pa)).to('arcsec').value
     delta_dec = (sep * np.cos(pa)).to('arcsec').value
     return (delta_ra, delta_dec)
+    
+    
+def get_coord_colon(c):
+    '''
+    Convert the coordinate to the (HH:MM:SS.SSS, DD:MM:SS.SSS) format.
+    
+    Parameters
+    ----------
+    c : SkyCoord
+        The coordinate object.
+    
+    Returns
+    -------
+    ra_colon, dec_colon : string
+        The coordinates in HH:MM:SS.SSS and DD:MM:SS.SSS
+    '''
+    try:
+        ra, dec = c.to_string('hmsdms').split(' ')
+    except ValueError:
+        return '00:00:00.000', '00:00:00.000'
+    ra_h = ra[:2]
+    ra_m = ra[3:5]
+    ra_s = float(ra[6:-1])
+    dec_d, dec_tmp = dec.split('d')
+    dec_m, dec_s = dec_tmp.split('m')
+    dec_s = float(dec_s[:-1])
+    ra_colon = '{0}:{1}:{2}'.format(ra_h, ra_m, '{0:.3f}'.format(ra_s).zfill(6))
+    dec_colon = '{0}:{1}:{2}'.format(dec_d, dec_m, '{0:.3f}'.format(dec_s).zfill(6))
+    return ra_colon, dec_colon
     
     
 def spec_params(Kagn):
