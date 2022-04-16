@@ -4,9 +4,14 @@ import matplotlib.pyplot as plt
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
 from astropy import units as u
-from astroplan import FixedTarget
-from astroplan import Observer
-from astroplan.plots import plot_airmass 
+
+try:
+    from astroplan import FixedTarget
+    from astroplan import Observer
+    from astroplan.plots import plot_airmass 
+except Exception:
+    print('Cannot import astroplan!')
+
 
 __all__ = ['modulepath', 'bandpass_dict', 'cal_mag', 'flux_calibration']
 
@@ -46,6 +51,7 @@ def cal_mag(wave, flux, band):
     favg = np.trapz(flux_interp * rsr_bp, wave_bp) / np.trapz(rsr_bp, wave_bp)
     mag = -2.5 * np.log10(favg / f0)
     return mag
+
 
 def flux_calibration(wave, flux, mag, band):
     '''
