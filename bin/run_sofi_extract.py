@@ -31,12 +31,9 @@ args = parser.parse_args()
 
 
 work_path = '.'
-pipe_path = os.environ['SOFIPIPELINE']
-calib_path = '{}/calib/sofi-1.5.13'.format(pipe_path)
-esorex = '{}/bin/esorex'.format(pipe_path)
-recipes = '--recipe-dir={}/lib/esopipes-plugins'.format(pipe_path)
+reduced_dir = 'reduced'
 
-sciDict = run_reduction.find_science_combined(work_path)
+sciDict = run_reduction.find_science_combined(work_path, reduced_dir)
 
 if len(sciDict) == 0:
     raise RuntimeError('Cannot find any data!')
@@ -46,7 +43,7 @@ else:
     print('#----------------------------\n')
 
 for k_fltr in sciDict:
-    arcList = run_reduction.find_arc_reduced(work_path, k_fltr)
+    arcList = run_reduction.find_arc_reduced(work_path, k_fltr, reduced_dir)
     wave = get_wavelength_arc(arcList[0]) / 1e4  # Micron
     
     sciList = sciDict[k_fltr]
@@ -60,8 +57,8 @@ for k_fltr in sciDict:
         sci = CCDData.read(sci_name, unit='adu')
         
         if args.plot:
-            if not os.path.exists('{}/figs'.format(work_path)):
-                os.makedirs('{}/figs'.format(work_path))
+            if not os.path.exists('{0}/{1}/figs'.format(work_path, reduced_dir)):
+                os.makedirs('{0}/{1}/figs'.format(work_path, reduced_dir))
                 
             fig = plt.figure(figsize=(14, 14))
             ax0 = fig.add_axes([0.02, 0.40, 0.45, 0.45])
@@ -94,7 +91,7 @@ for k_fltr in sciDict:
             ax3.set_xlabel('Wavelength ($\mu$m)', fontsize=24)
             ax3.set_ylabel('Flux (ADU)', fontsize=24)
             ax3.minorticks_on()
-            plt.savefig('{0}/figs/{1}.pdf'.format(work_path, fig_name), bbox_inches='tight')
+            plt.savefig('{0}/{1}/figs/{2}.pdf'.format(work_path, reduced_dir, fig_name), bbox_inches='tight')
             plt.close()
                         
                         

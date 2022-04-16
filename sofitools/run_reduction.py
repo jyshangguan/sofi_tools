@@ -71,12 +71,12 @@ def find_science_raw(file_path):
     return sciDict
 
 
-def find_arc_reduced(work_path, filter):
+def find_arc_reduced(work_path, filter, reduced_dir='reduced'):
     '''
     Find the reduced arc data.
     '''
     if not os.path.isabs(work_path):
-        work_path = '{0}/{1}'.format(cwd, work_path)
+        work_path = '{0}/{1}/{2}'.format(cwd, work_path, reduced_dir)
     fList = sorted(glob('{}/*.fits'.format(work_path)))
     
     arcList = []
@@ -89,12 +89,12 @@ def find_arc_reduced(work_path, filter):
     return arcList
     
 
-def find_flat_reduced(work_path, filter):
+def find_flat_reduced(work_path, filter, reduced_dir='reduced'):
     '''
     Find the reduced flat data.
     '''
     if not os.path.isabs(work_path):
-        work_path = '{0}/{1}'.format(cwd, work_path)
+        work_path = '{0}/{1}/{2}'.format(cwd, work_path, reduced_dir)
     fList = sorted(glob('{}/*.fits'.format(work_path)))
     
     flatList = []
@@ -107,12 +107,12 @@ def find_flat_reduced(work_path, filter):
     return flatList
 
 
-def find_science_combined(work_path):
+def find_science_combined(work_path, reduced_dir='reduced'):
     '''
     Find the reduced science data.
     '''
     if not os.path.isabs(work_path):
-        work_path = '{0}/{1}'.format(cwd, work_path)
+        work_path = '{0}/{1}/{2}'.format(cwd, work_path, reduced_dir)
     fList = sorted(glob('{}/*.fits'.format(work_path)))
     
     sciDict = {}
@@ -130,7 +130,7 @@ def find_science_combined(work_path):
     return sciDict
         
 
-def write_arc_sof(file_list, work_path, calib_path):
+def write_arc_sof(file_list, work_path, calib_path, reduced_dir='reduced'):
     '''
     Write the SOF file of arc data.
     '''
@@ -139,7 +139,7 @@ def write_arc_sof(file_list, work_path, calib_path):
     
     assert len(file_list) > 0, 'No data is found!'
     
-    sof_path = '{}/arc.sof'.format(work_path)
+    sof_path = '{0}/{1}/arc.sof'.format(work_path, reduced_dir)
     with open(sof_path, 'w') as f:
         for fn in file_list:
             f.write('{} SP_ARC\n'.format(fn))
@@ -148,7 +148,7 @@ def write_arc_sof(file_list, work_path, calib_path):
     return sof_path
             
 
-def write_flat_sof(file_list, work_path):
+def write_flat_sof(file_list, work_path, reduced_dir='reduced'):
     '''
     Write the SOF file of flat data.
     '''
@@ -157,14 +157,15 @@ def write_flat_sof(file_list, work_path):
     
     assert len(file_list) > 0, 'No data is found!'
         
-    sof_path = '{}/flat.sof'.format(work_path)
+    sof_path = '{0}/{1}/flat.sof'.format(work_path, reduced_dir)
     with open(sof_path, 'w') as f:
         for fn in file_list:
             f.write('{} SP_FLAT\n'.format(fn))
     return sof_path
     
     
-def write_jitter_sof(file_list, arc_list, flat_list, work_path, calib_path):
+def write_jitter_sof(file_list, arc_list, flat_list, work_path, calib_path, 
+                     reduced_dir='reduced'):
     '''
     Write the SOF file of science data.
     '''
@@ -174,7 +175,7 @@ def write_jitter_sof(file_list, arc_list, flat_list, work_path, calib_path):
     assert len(file_list) > 0, 'No data is found!'
         
     filename = file_list[0].split('/')[-1][:-5]
-    sof_path = '{0}/{1}_jitter.sof'.format(work_path, filename)
+    sof_path = '{0}/{1}/{2}_jitter.sof'.format(work_path, reduced_dir, filename)
 
     with open(sof_path, 'w') as f:
         for fn in file_list:
