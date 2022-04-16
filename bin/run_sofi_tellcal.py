@@ -28,6 +28,8 @@ parser.add_argument('-t', '--type', default='A0V', dest='type', type=str,
                     help='The stellar type of the telluric standard [A0V]')
 parser.add_argument('-p', '--plot', dest='plot', default=False, action='store_true',
                     help='Plot the calibrated spectrum [False]')
+parser.add_argument('-r', '--redo', dest='redo', default=False, action='store_true',
+                    help='Redo the calibration regardless whether the data exists [False]')
 parser.add_argument('--ncut', dest='ncut', default=20, type=int, 
                     help='Number of pixels to cut [20]')
 args = parser.parse_args()
@@ -38,6 +40,11 @@ sci_file = '{0}/{1}'.format(work_path, args.sci)
 cal_file = '{0}/{1}'.format(work_path, args.cal)
 assert os.path.isfile(sci_file), 'Cannot find the science file ({})!'.format(args.sci)
 assert os.path.isfile(cal_file), 'Cannot find the telluric file ({})!'.format(args.cal)
+
+calibrated_name = '{0}/{1}_calibrated.fits'.format(work_path, args.sci[:-5])
+if not args.redo:
+    if os.path.isfile(calibrated_name):
+        raise Exception('The data already calibrated ({})!'.format(calibrated_name))
 
 sci = fits.open(sci_file)
 cal = fits.open(cal_file)
@@ -53,12 +60,17 @@ flux_cal = cal[1].data['Flux']
 if (wave != wave_cal).any():
     flux_cal = np.interp(wave, wave_cal, flux_cal)
 
-if args.type == 'A0V':
-    tel_corr = telluric_correction.telluric_correction_A0V(wave, flux_cal)
-elif args.type == 'B9V':
-    tel_corr = telluric_correction.telluric_correction_B9V(wave, flux_cal)
-else:
-    raise Exception('The stellar model ({}) is not available!'.format(args.type))
+#if args.type == 'A0V':
+#    tel_corr = telluric_correction.telluric_correction_A0V(wave, flux_cal)
+#elif args.type == 'B9V':
+#    tel_corr = telluric_correction.telluric_correction_B9V(wave, flux_cal)
+#else:
+#    raise Exception('The stellar model ({}) is not available!'.format(args.type))
+
+try:
+    tel_corr = telluric_correction.template_correction(wave, flux_cal, args.type)
+except KeyError:
+    raise KeyError('The input --type ({}) is not supported. Try to use only "A" or "B" for a quick analysis!'.format(args.type))
 
 flux_sci_corr = flux_sci * tel_corr
 
@@ -67,7 +79,6 @@ c2 = fits.Column(name='Flux', format='Float64', unit='adu', array=flux_sci_corr)
 hdul = fits.HDUList([fits.PrimaryHDU(header=sci[0].header),
                      fits.BinTableHDU.from_columns([c1, c2])])
 hdul[0].header['ESO PRO CATG'] = 'OBS_SPC1D_CORR'
-calibrated_name = '{0}/{1}_calibrated.fits'.format(work_path, args.sci[:-5])
 hdul.writeto(calibrated_name, overwrite=True)
 
 if args.plot:

@@ -54,6 +54,46 @@ def telluric_correction_B9V(wave, flux):
     return tel_corr
     
 
+def template_correction(wave, flux, stellar_type='A0V'):
+    '''
+    Calculate the telluric correction spectrum based on a standard star.
+    This is still a very preliminary method.
+    
+    Parameters
+    ----------
+    wave, flux : 1d array
+        Wavelength and flux of the standard star.
+    stellar_type : str (default: A0V)
+        Stellar type.
+    
+    Returns
+    -------
+    tel_corr : 1d array
+        Telluric correction spectrum.
+    '''
+    if stellar_type == 'A':
+        spec_pickles1998 = np.loadtxt('{}/Pickles1998_A0V.dat'.format(templatepath))
+    elif stellar_type == 'B':
+        spec_pickles1998 = np.loadtxt('{}/Pickles1998_B0V.dat'.format(templatepath))
+    elif stellar_type in ['A0V', 'A2V', 'B0V', 'B1V', 'B2IV', 'B3V', 'B9V']:
+        spec_pickles1998 = np.loadtxt('{0}/Pickles1998_{1}.dat'.format(templatepath, stellar_type))
+    else:
+        raise KeyError('The stellar type ({}) is not recognized!'.format(stellar_type))
+
+    fltr = (spec_pickles1998[:, 0] > 1.2e3) & (spec_pickles1998[:, 0] < 2.5e3)
+    wave_tel = spec_pickles1998[fltr, 0] * 1e-3  # Micron
+    flux_tel = spec_pickles1998[fltr, 1]
+    
+    
+    flux_tel_interp = np.interp(wave, wave_tel, flux_tel)
+    
+    tel_corr = flux_tel_interp / flux
+    tel_corr /= np.nanmedian(tel_corr)
+    fltr = np.isnan(tel_corr) | ~np.isfinite(tel_corr)
+    tel_corr[fltr] = 0
+    return tel_corr
+    
+
 templatepath = '{}/../data/telluric_template'.format(modulepath)
 
 # From http://cdsarc.u-strasbg.fr/viz-bin/vizExec/Vgraph?J/PASP/110/863/./uka0v&
