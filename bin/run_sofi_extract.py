@@ -31,12 +31,12 @@ args = parser.parse_args()
 
 
 work_path = '.'
-reduced_dir = 'reduced'
+reduced_dir = '.'
 
 sciDict = run_reduction.find_science_combined(work_path, reduced_dir)
 
 if len(sciDict) == 0:
-    raise RuntimeError('Cannot find any data!')
+    raise RuntimeError('Cannot find any data in this directory!')
 else:
     print('#----------------------------')
     print('# Find data in these filters: {}'.format(list(sciDict.keys())))
@@ -45,6 +45,8 @@ else:
 for k_fltr in sciDict:
     arcList = run_reduction.find_arc_reduced(work_path, k_fltr, reduced_dir)
     wave = get_wavelength_arc(arcList[0]) / 1e4  # Micron
+    idx_sort = np.argsort(wave)
+    wave = wave[idx_sort]
     
     sciList = sciDict[k_fltr]
     for sci_name in sciList:
@@ -73,6 +75,7 @@ for k_fltr in sciDict:
                                std_init=args.std_init, plot=args.plot, 
                                axs=axs)
         sci_spc1d = sci.data[:, res[0]:res[1]].sum(axis=1)
+        sci_spc1d = sci_spc1d[idx_sort]
         
         c1 = fits.Column(name='Wavelength', format='Float64', unit='micron', array=wave)
         c2 = fits.Column(name='Flux', format='Float64', unit='adu', array=sci_spc1d)

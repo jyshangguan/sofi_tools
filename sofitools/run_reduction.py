@@ -77,6 +77,8 @@ def find_arc_reduced(work_path, filter, reduced_dir='reduced'):
     '''
     if not os.path.isabs(work_path):
         work_path = '{0}/{1}/{2}'.format(cwd, work_path, reduced_dir)
+    else:
+        work_path = '{0}/{1}'.format(work_path, reduced_dir)
     fList = sorted(glob('{}/*.fits'.format(work_path)))
     
     arcList = []
@@ -95,6 +97,8 @@ def find_flat_reduced(work_path, filter, reduced_dir='reduced'):
     '''
     if not os.path.isabs(work_path):
         work_path = '{0}/{1}/{2}'.format(cwd, work_path, reduced_dir)
+    else:
+        work_path = '{0}/{1}'.format(work_path, reduced_dir)
     fList = sorted(glob('{}/*.fits'.format(work_path)))
     
     flatList = []
@@ -113,6 +117,8 @@ def find_science_combined(work_path, reduced_dir='reduced'):
     '''
     if not os.path.isabs(work_path):
         work_path = '{0}/{1}/{2}'.format(cwd, work_path, reduced_dir)
+    else:
+        work_path = '{0}/{1}'.format(work_path, reduced_dir)
     fList = sorted(glob('{}/*.fits'.format(work_path)))
     
     sciDict = {}
