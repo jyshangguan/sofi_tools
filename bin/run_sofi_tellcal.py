@@ -60,13 +60,6 @@ flux_cal = cal[1].data['Flux']
 if (wave != wave_cal).any():
     flux_cal = np.interp(wave, wave_cal, flux_cal)
 
-#if args.type == 'A0V':
-#    tel_corr = telluric_correction.telluric_correction_A0V(wave, flux_cal)
-#elif args.type == 'B9V':
-#    tel_corr = telluric_correction.telluric_correction_B9V(wave, flux_cal)
-#else:
-#    raise Exception('The stellar model ({}) is not available!'.format(args.type))
-
 try:
     tel_corr = telluric_correction.template_correction(wave, flux_cal, args.type)
 except KeyError:
@@ -82,6 +75,9 @@ hdul[0].header['ESO PRO CATG'] = 'OBS_SPC1D_CORR'
 hdul.writeto(calibrated_name, overwrite=True)
 
 if args.plot:
+    if not os.path.isdir('{0}/figs'.format(work_path)):
+        os.makedirs('{0}/figs'.format(work_path))
+        
     fig_name = calibrated_name.split('/')[-1][:-5]
     obj_name = hdul[0].header.get('OBJECT')
     
