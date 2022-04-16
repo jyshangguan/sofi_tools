@@ -83,13 +83,15 @@ if args.plot:
     
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.step(wave, flux_sci_corr)
-    ax.text(0.01, 0.05, '{0}, {1}'.format(obj_name, sci_filter), fontsize=24,
-            transform=ax.transAxes, va='bottom', ha='left')
+    ax.set_title('{0}, {1}'.format(obj_name, sci_filter), fontsize=24)
     
     fltr_wave = ((wave < 1.8) | (wave > 1.95)) & (wave > wave[args.ncut]) & (wave < wave[-args.ncut])
     mean, median, stddev = sigma_clipped_stats(flux_sci_corr[fltr_wave])
     ymin = median - 5 * stddev
     ymax = np.max(flux_sci_corr[fltr_wave] + 5 * stddev)
+    snr = median / stddev
+    ax.text(0.01, 0.05, 'S/N={0:.2f}'.format(snr), fontsize=24,
+            transform=ax.transAxes, va='bottom', ha='left')
     
     ax.set_ylim([ymin, ymax])
     ax.set_xlabel('Wavelength ($\mu$m)', fontsize=24)
