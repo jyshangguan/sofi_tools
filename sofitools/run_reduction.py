@@ -37,6 +37,10 @@ def find_flat_raw(file_path):
         header = fits.getheader(f, ext=0)
         dprcatg = header.get('ESO DPR CATG')
         dprtype = header.get('ESO DPR TYPE')
+        dprtech = header.get('ESO DPR TECH')
+        if dprtech == 'IMAGE':
+            continue
+            
         if (dprcatg == 'CALIB') & (dprtype == 'FLAT'):
             flatList.append(f)
     return flatList
@@ -55,6 +59,10 @@ def find_science_raw(file_path):
         header = fits.getheader(f, ext=0)
         dprcatg = header.get('ESO DPR CATG')
         dprtype = header.get('ESO DPR TYPE')
+        dprtech = header.get('ESO DPR TECH')
+        if dprtech == 'IMAGE':
+            continue
+        
         name = header.get('ESO OBS TARG NAME')
         
         fltname =  header.get('ESO INS FILT1 NAME')
