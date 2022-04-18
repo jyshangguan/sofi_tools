@@ -21,7 +21,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Extract 1D spectrum')
 parser.add_argument('-w', '--nstd', default=5, dest='nstd', type=float, 
                     help='Extraction box (half) width')
-parser.add_argument('-c', '--ncut', default=20, dest='ncut', type=str, 
+parser.add_argument('-c', '--ncut', default='20', dest='ncut', type=str, 
                     help='Cut the edges of the detector [20]. For example, -c 20 or -c 20,1000')
 parser.add_argument('-i', '--std_init', default=10, dest='std_init', type=float, 
                     help='Initial guess of the Gaussian fitting')
@@ -83,7 +83,11 @@ for k_fltr in sciDict:
                                std_init=args.std_init, plot=args.plot, 
                                axs=axs)
         sci_spc1d = sci.data[:, res[0]:res[1]].sum(axis=1)
-        sci_spc1d = sci_spc1d[idx_sort]
+        #bwidth = res[1] - res[0]
+        #bak_left = sci.data[:, res[0]-bwidth:res[0]]
+        #bak_right = sci.data[:, res[1]:res[1]+bwidth]
+        #bak_med = np.median(np.concatenate([bak_left, bak_right], axis=1), axis=1)
+        #sci_spc1d = sci_spc1d[idx_sort] - bak_med
         
         c1 = fits.Column(name='Wavelength', format='Float64', unit='micron', array=wave)
         c2 = fits.Column(name='Flux', format='Float64', unit='adu', array=sci_spc1d)
