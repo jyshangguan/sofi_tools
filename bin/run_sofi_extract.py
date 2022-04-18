@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='Extract 1D spectrum')
 parser.add_argument('-w', '--nstd', default=5, dest='nstd', type=float, 
                     help='Extraction box (half) width')
 parser.add_argument('-c', '--ncut', default=20, dest='ncut', type=str, 
-                    help='Cut the edges of the detector, [int] or [int, int], [20]')
+                    help='Cut the edges of the detector [20]. For example, -c 20 or -c 20,1000')
 parser.add_argument('-i', '--std_init', default=10, dest='std_init', type=float, 
                     help='Initial guess of the Gaussian fitting')
 parser.add_argument('-p', '--plot', default=False, dest='plot', 
