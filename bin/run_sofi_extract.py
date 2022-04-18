@@ -83,11 +83,7 @@ for k_fltr in sciDict:
                                std_init=args.std_init, plot=args.plot, 
                                axs=axs)
         sci_spc1d = sci.data[:, res[0]:res[1]].sum(axis=1)
-        #bwidth = res[1] - res[0]
-        #bak_left = sci.data[:, res[0]-bwidth:res[0]]
-        #bak_right = sci.data[:, res[1]:res[1]+bwidth]
-        #bak_med = np.median(np.concatenate([bak_left, bak_right], axis=1), axis=1)
-        #sci_spc1d = sci_spc1d[idx_sort] - bak_med
+        sci_spc1d = sci_spc1d[idx_sort]
         
         c1 = fits.Column(name='Wavelength', format='Float64', unit='micron', array=wave)
         c2 = fits.Column(name='Flux', format='Float64', unit='adu', array=sci_spc1d)
