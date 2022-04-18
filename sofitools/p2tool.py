@@ -590,7 +590,7 @@ class p2api_SOFI(object):
         items = api.getItems(self._rootContainterId)[0]
         for it in items:
             name = it['name']
-            if it['itemType'] == 'OB':
+            if it['itemType'] in ['OB', 'CB']:
                 if name in self.rootDict:
                     if not no_warning:
                         raise Warning('OB "{}" already exists in Root!'.format(name))
