@@ -58,7 +58,15 @@ def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False, axs=None):
     '''
     space_profile = np.median(data, axis=0)
     
-    y = space_profile[slice(ncut, -ncut)]
+    if isinstance(ncut, int):
+        y = space_profile[slice(ncut, -ncut)]
+        nstart = ncut
+    elif isinstance(ncut, tuple): 
+        y = space_profile[slice(ncut[0], ncut[1])]
+        nstart = ncut[0]
+    else:
+        raise TypeError('The type of ncut is not correct!')
+    
     x_p = np.argmax(y)
     
     g_init = models.Gaussian1D(amplitude=y[x_p], mean=x_p, stddev=std_init)
@@ -67,7 +75,7 @@ def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False, axs=None):
     x = np.arange(len(y))
     g = fit_g(g_init, x, y)
     
-    mean = g.mean + ncut
+    mean = g.mean + nstart
     std = g.stddev
     x0, x1 = int(np.floor(mean - nstd * std)), int(np.ceil(mean + nstd * std))
     
@@ -96,7 +104,7 @@ def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False, axs=None):
         
         ax = ax1
         ax.plot(space_profile, label='Spatial profile')
-        ax.plot(x + ncut, g(x), label='Fit')
+        ax.plot(x + nstart, g(x), label='Fit')
         ax.axvspan(xmin=x0, xmax=x1, ls='--', fc='none', ec='C3', lw=lw, label='Extraction')
         ax.legend(loc='best', fontsize=16)
         ax.set_ylabel('Intensity (ADU)', fontsize=24)
@@ -106,7 +114,7 @@ def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False, axs=None):
         ax = ax2
         ax.plot(y, label='Spatial profile')
         ax.plot(x, g(x), label='Fit')
-        ax.axvspan(xmin=x0-ncut, xmax=x1-ncut, ls='--', fc='none', ec='C3', lw=lw, label='Extraction')
+        ax.axvspan(xmin=x0-nstart, xmax=x1-nstart, ls='--', fc='none', ec='C3', lw=lw, label='Extraction')
         ax.set_xlabel('Space (pixel)', fontsize=24)
         ax.set_ylabel('Intensity (ADU)', fontsize=24)
         ax.set_title('(c) Spatial zoomed to fit', fontsize=24)

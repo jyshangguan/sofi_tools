@@ -21,8 +21,8 @@ import argparse
 parser = argparse.ArgumentParser(description='Extract 1D spectrum')
 parser.add_argument('-w', '--nstd', default=5, dest='nstd', type=float, 
                     help='Extraction box (half) width')
-parser.add_argument('-c', '--ncut', default=20, dest='ncut', type=int, 
-                    help='Cut the edges of the detector')
+parser.add_argument('-c', '--ncut', default=20, dest='ncut', type=str, 
+                    help='Cut the edges of the detector, [int] or [int, int], [20]')
 parser.add_argument('-i', '--std_init', default=10, dest='std_init', type=float, 
                     help='Initial guess of the Gaussian fitting')
 parser.add_argument('-p', '--plot', default=False, dest='plot', 
@@ -42,6 +42,14 @@ else:
     print('# Find data in these filters: {}'.format(list(sciDict.keys())))
     print('#----------------------------\n')
 
+if ',' in args.ncut:
+    ncut = args.ncut.split(',')
+    c0 = int(ncut[0])
+    c1 = int(ncut[1])
+else:
+    c0 = int(args.ncut)
+    c1 = -c0
+    
 for k_fltr in sciDict:
     arcList = run_reduction.find_arc_reduced(work_path, k_fltr, reduced_dir)
     wave = get_wavelength_arc(arcList[0]) / 1e4  # Micron
