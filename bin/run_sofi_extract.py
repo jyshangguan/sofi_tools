@@ -44,11 +44,11 @@ else:
 
 if ',' in args.ncut:
     ncut = args.ncut.split(',')
-    c0 = int(ncut[0])
-    c1 = int(ncut[1])
+    cut0 = int(ncut[0])
+    cut1 = int(ncut[1])
 else:
-    c0 = int(args.ncut)
-    c1 = -c0
+    cut0 = int(args.ncut)
+    cut1 = -cut0
     
 for k_fltr in sciDict:
     arcList = run_reduction.find_arc_reduced(work_path, k_fltr, reduced_dir)
@@ -79,7 +79,7 @@ for k_fltr in sciDict:
         else:
             axs = None
                 
-        res = find_extract_box(sci, nstd=args.nstd, ncut=args.ncut, 
+        res = find_extract_box(sci, nstd=args.nstd, ncut=(cut0, cut1), 
                                std_init=args.std_init, plot=args.plot, 
                                axs=axs)
         sci_spc1d = sci.data[:, res[0]:res[1]].sum(axis=1)
