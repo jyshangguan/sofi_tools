@@ -83,17 +83,19 @@ def cal_airmass(ra_target, dec_target, ra_telluric, dec_telluric, time, observer
     airmass_target = observer.altaz(time, t_targ).secz.value
     
     t_tell = FixedTarget(coord=c_tell, name=None)
-    time_tell = time + delta_time * u.hour
+    time_tell = time + delta_time  #* u.hour
     airmass_tell = observer.altaz(time_tell, t_tell).secz.value
     
     if plot:
-        observe_time = time + np.linspace(0, 15, 55)*u.hour
+        now = Time.now()
+        observe_time = time + np.linspace(-12, 12, 50)*u.hour
         
         if ax is None:
             fig, ax = plt.subplots(figsize=(15, 8))
         plot_airmass(t_targ, observer, observe_time, ax=ax, brightness_shading=True, style_kwargs=dict(color='C3'))
         plot_airmass(t_tell, observer, observe_time, ax=ax, brightness_shading=True, style_kwargs=dict(color='C0'))
         
+        ax.axvline(x=now.plot_date, ls='--', color='C1')
         ax.axvline(x=time.plot_date, ls='--', color='C3')
         ax.axhline(y=airmass_target, ls='--', color='C3')
         ax.axvline(x=time_tell.plot_date, ls='--', color='C0')
@@ -105,7 +107,7 @@ def cal_airmass(ra_target, dec_target, ra_telluric, dec_telluric, time, observer
         t = '\n'.join(['Separation: {0:.1f} degree'.format(c_targ.separation(c_tell).degree),
                        'delta_airmass: {0:.1e}'.format(np.abs(airmass_target-airmass_tell))])
         ax.text(0.99, 1.01, t, fontsize=18, transform=ax.transAxes, va='bottom', ha='right')
-        t = '{0} (+{1} hour)'.format(time.iso, delta_time)
+        t = '{0} (+{1:.1f} hour)'.format(time.iso, delta_time.to_value('hr'))
         ax.text(0.02, 0.04, t, fontsize=18, transform=ax.transAxes, va='bottom', ha='left')
         ax.minorticks_on()
     return airmass_target, airmass_tell

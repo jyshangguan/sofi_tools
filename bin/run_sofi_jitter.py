@@ -31,6 +31,9 @@ for k_fltr in sciDict:
     flatList = run_reduction.find_flat_reduced(work_path, k_fltr, reduced_dir)
     for tn in sciDict[k_fltr]:
         sciList = sciDict[k_fltr][tn]
+        if len(sciList) % 2 != 0:
+            sciList = sciList[:-1]
+            print('[Warning] Odd number of files. Skip the last data file!')
         scisof = run_reduction.write_jitter_sof(sciList, arcList, flatList, work_path, 
                                                 calib_path, reduced_dir)
         combined_name = '{0}_combined.fits'.format(scisof[:-4])

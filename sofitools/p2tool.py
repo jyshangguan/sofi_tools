@@ -813,26 +813,23 @@ def get_coord_colon(c):
     
     
 def spec_params(Kagn):
-    if Kagn <= 12.5:
-        dit = 15
-        ndit = 3
-        nint = 2
-        nabc = 3
-    elif (Kagn > 12.5) & (Kagn <= 13.5):
+    if Kagn <= 12.5:  # 18 min
         dit = 30
         ndit = 3
         nint = 2
-        nabc = 2
-    elif (Kagn > 13.5) & (Kagn <= 14.5):
+        nabc = 3
+    elif (Kagn > 12.5) & (Kagn <= 13.5):  # 48 min
+        dit = 30
+        ndit = 3
+        nint = 2
+        nabc = 8
+    elif (Kagn > 13.5) & (Kagn <= 16):  # 3.2 hour
         dit = 60
-        ndit = 3
+        ndit = 2
         nint = 2
-        nabc = 2
-    elif (Kagn > 14.5) & (Kagn <= 16):
-        dit = 120
-        ndit = 3
-        nint = 2
-        nabc = 2
+        nabc = 15
+    else:
+        raise Exception('Too faint!!')
     return dit, ndit, nint, nabc
 
         
@@ -842,16 +839,16 @@ def imag_on_params(Kagn):
     '''
     if (Kagn > 10) & (Kagn <= 11):
         dit = 2
-        ndit = 10
-        nexpo = 1
+        ndit = 2
+        nexpo = 5
     elif (Kagn > 11) & (Kagn <= 12):
         dit = 4
-        ndit = 10
-        nexpo = 1
+        ndit = 2
+        nexpo = 5
     elif (Kagn > 12) & (Kagn <= 13.5):
         dit = 8
-        ndit = 10
-        nexpo = 1
+        ndit = 2
+        nexpo = 5
     else:
         raise Warning('Kagn ({}) Out of the useful range!'.format(Kagn))
     return dit, ndit, nexpo
@@ -863,12 +860,12 @@ def imag_off_params(Kagn):
     '''
     if (Kagn <= 14):
         dit = 4
-        ndit = 60
-        nexpo = 1
+        ndit = 12
+        nexpo = 5
     elif (Kagn > 14) & (Kagn <= 16):
         dit = 4
-        ndit = 90
-        nexpo = 1
+        ndit = 18
+        nexpo = 5
     else:
         raise Warning('Kagn ({}) Out of the useful range!'.format(Kagn))
     return dit, ndit, nexpo
