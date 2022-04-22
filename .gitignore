@@ -130,3 +130,4 @@ dmypy.json
 
 # My ignore
 data/vegallpr25.50000resam5
+data/.DS_Store

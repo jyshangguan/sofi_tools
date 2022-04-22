@@ -813,20 +813,20 @@ def get_coord_colon(c):
     
     
 def spec_params(Kagn):
-    if Kagn <= 12.5:  # 18 min
+    if Kagn <= 13.0:  # 18 min
         dit = 30
         ndit = 3
         nint = 2
         nabc = 3
-    elif (Kagn > 12.5) & (Kagn <= 13.5):  # 48 min
+    elif (Kagn > 13.0) & (Kagn <= 14.0):  # 48 min
         dit = 30
         ndit = 3
         nint = 2
         nabc = 8
-    elif (Kagn > 13.5) & (Kagn <= 16):  # 3.2 hour
-        dit = 60
+    elif (Kagn > 14.0) & (Kagn <= 16):  # 3.2 hour
+        dit = 120
         ndit = 2
-        nint = 2
+        nint = 1
         nabc = 15
     else:
         raise Exception('Too faint!!')
@@ -837,7 +837,11 @@ def imag_on_params(Kagn):
     '''
     Parameters for imaging OB for on-axis targets
     '''
-    if (Kagn > 10) & (Kagn <= 11):
+    if (Kagn > 9) & (Kagn <= 10):
+        dit = 1
+        ndit = 4
+        nexpo = 5
+    elif (Kagn > 10) & (Kagn <= 11):
         dit = 2
         ndit = 2
         nexpo = 5
