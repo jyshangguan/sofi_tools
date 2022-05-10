@@ -69,7 +69,10 @@ def find_extract_box(data, nstd=5, ncut=20, std_init=10, plot=False, axs=None):
     
     x_p = np.argmax(y)
     
-    g_init = models.Gaussian1D(amplitude=y[x_p], mean=x_p, stddev=std_init)
+    g_init = models.Gaussian1D(amplitude=y[x_p], mean=x_p, stddev=std_init, 
+                               bounds=dict(amplitude=[0, None], 
+                                           mean=[0, 1024],
+                                           stddev=[1, 20]))
     fit_g = fitting.LevMarLSQFitter()
     
     x = np.arange(len(y))

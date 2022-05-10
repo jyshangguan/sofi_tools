@@ -37,6 +37,7 @@ for k_fltr in sciDict:
         scisof = run_reduction.write_jitter_sof(sciList, arcList, flatList, work_path, 
                                                 calib_path, reduced_dir)
         combined_name = '{0}_combined.fits'.format(scisof[:-4])
+        rec_name = '{0}_nodded_rec.fits'.format(scisof[:-4])
         
         if os.path.isfile(combined_name):
             print('{}\n  File exists, skip the reduction...\n'.format(combined_name))
@@ -60,6 +61,11 @@ for k_fltr in sciDict:
                     break
             
             process = subprocess.Popen(['mv', '{0}/sofi_spc_jitter_combined.fits'.format(work_path), combined_name],
+                         stdout=subprocess.PIPE, 
+                         stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+            
+            process = subprocess.Popen(['mv', '{0}/sofi_spc_jitter_nodded_rec.fits'.format(work_path), rec_name],
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
             stdout, stderr = process.communicate()
