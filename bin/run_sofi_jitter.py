@@ -4,6 +4,12 @@ from astropy.io import fits
 from glob import glob
 import subprocess
 from sofitools import run_reduction
+import argparse
+
+parser = argparse.ArgumentParser(description='Reduce science data')
+parser.add_argument('-f', '--flat', dest='flat', default=False, action='store_true',
+                    help='Use the FLAT in the reduction [False]')
+args = parser.parse_args()
 
 work_path = './'
 reduced_dir = 'reduced'
@@ -28,7 +34,12 @@ else:
 
 for k_fltr in sciDict:
     arcList = run_reduction.find_arc_reduced(work_path, k_fltr, reduced_dir)
-    flatList = run_reduction.find_flat_reduced(work_path, k_fltr, reduced_dir)
+    
+    if args.flat:
+        flatList = run_reduction.find_flat_reduced(work_path, k_fltr, reduced_dir)
+    else:
+        flatList = []
+        
     for tn in sciDict[k_fltr]:
         sciList = sciDict[k_fltr][tn]
         if len(sciList) % 2 != 0:
