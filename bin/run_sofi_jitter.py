@@ -37,7 +37,6 @@ for k_fltr in sciDict:
         scisof = run_reduction.write_jitter_sof(sciList, arcList, flatList, work_path, 
                                                 calib_path, reduced_dir)
         combined_name = '{0}_combined.fits'.format(scisof[:-4])
-        rec_name = '{0}_nodded_rec.fits'.format(scisof[:-4])
         
         if os.path.isfile(combined_name):
             print('{}\n  File exists, skip the reduction...\n'.format(combined_name))
@@ -64,12 +63,14 @@ for k_fltr in sciDict:
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
             stdout, stderr = process.communicate()
+        except Exception as e:
+            print('Skip this target because the of the following error:\n {}'.format(e))
             
+        rec_name = '{0}_nodded_rec.fits'.format(scisof[:-4])
+        if os.path.isfile('{0}/sofi_spc_jitter_nodded_rec.fits'.format(work_path)):
             process = subprocess.Popen(['mv', '{0}/sofi_spc_jitter_nodded_rec.fits'.format(work_path), rec_name],
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
             stdout, stderr = process.communicate()
-        except Exception as e:
-            print('Skip this target because the of the following error:\n {}'.format(e))
 
 os.system('mv {0}/*.paf {0}/{1}'.format(work_path, reduced_dir))
