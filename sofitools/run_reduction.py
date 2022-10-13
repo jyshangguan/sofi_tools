@@ -187,7 +187,9 @@ def find_science_combined(work_path, reduced_dir='reduced'):
         header = fits.getheader(f, ext=0)
         procatg = header.get('ESO PRO CATG')
         fltname =  header.get('ESO INS FILT1 NAME')
-        assert fltname is not None, 'The filter is wrong??'
+        #assert fltname is not None, 'The filter is wrong??'
+        if fltname is None:
+            continue
 
         if (procatg == 'OBS_COMBINED'):
             if fltname in sciDict:
