@@ -649,7 +649,7 @@ def search_simbad(name):
     return ra_hms, dec_dms, pma, pmd
     
     
-def create_OB_telluric(name, sofi, folder_name='tmp', dit_acq=10, ndit_acq=1, dit=10, ndit=1, save=True):
+def create_OB_telluric(name, sofi, folder_name='tmp', dit_acq=10, ndit_acq=1, dit=10, ndit=1, save=True, whichslit='long_slit_1', smode='LONG_SLIT_K'):
     '''
     Create an OB for the telluric star.
     
@@ -665,6 +665,8 @@ def create_OB_telluric(name, sofi, folder_name='tmp', dit_acq=10, ndit_acq=1, di
     dit : float (default: 10)
     ndit : float (default: 1)
     save : bool (default: True)
+    whichslit : str (default: long_slit_1)
+    smode : str (default: LONG_SLIT_K)
     '''
     ra, dec, pma, pmd = search_simbad(name)
     
@@ -682,8 +684,8 @@ def create_OB_telluric(name, sofi, folder_name='tmp', dit_acq=10, ndit_acq=1, di
     obsDes['userComments'] = 'Telluric star for {}'.format(folder_name)
     ob, obV = sofi.save_OB(ob_name, folder_name=folder_name)
     
-    sofi.add_SOFI_img_acq_MoveToSlit(ob_name, folder_name=folder_name, dit=dit_acq, ndit=ndit_acq, save=save)
-    sofi.add_SOFI_spec_obs_AutoNodNonDestr(ob_name, folder_name=folder_name, dit=dit, ndit=ndit, nint=1, nabcycles=1)
+    sofi.add_SOFI_img_acq_MoveToSlit(ob_name, folder_name=folder_name, dit=dit_acq, ndit=ndit_acq, save=save, whichslit=whichslit)
+    sofi.add_SOFI_spec_obs_AutoNodNonDestr(ob_name, folder_name=folder_name, dit=dit, ndit=ndit, nint=1, nabcycles=1, whichslit=whichslit, smode=smode)
     sofi.verifyOB(ob)
     
 
