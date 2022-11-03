@@ -209,7 +209,7 @@ class p2api_SOFI(object):
         
         
     def add_SOFI_img_acq_MoveToSlit(self, name, folder_name=None, dit=1, ndit=1, 
-                                    filt1='Ks', filt2='open', whichslit='long_slit_1', 
+                                    filt1='Ks', filt2='open', whichslit='long_slit_0.6', 
                                     offsetalpha=0, offsetdelta=0, addvelalpha=0, 
                                     addveldelta=0, offangle=0, offset=False, preset=True, 
                                     save=False):
@@ -348,7 +348,7 @@ class p2api_SOFI(object):
     def add_SOFI_spec_obs_AutoNodNonDestr(self, name, folder_name=None, exp_name='SOFI', 
                                           dit=1, ndit=1, ndsamples=4, nsamppix=4, 
                                           win_nx=1024, win_ny=1024, startx=1, starty=1, 
-                                          smode='LONG_SLIT_K', whichslit='long_slit_1', 
+                                          smode='LONG_SLIT_RED', whichslit='long_slit_0.6', 
                                           offset=False, jitter_width=40, return_org=True, 
                                           nodthrow=60, nint=1, nabcycles=1):
         '''
@@ -649,7 +649,7 @@ def search_simbad(name):
     return ra_hms, dec_dms, pma, pmd
     
     
-def create_OB_telluric(name, sofi, folder_name='tmp', dit_acq=10, ndit_acq=1, dit=10, ndit=1, save=True, whichslit='long_slit_1', smode='LONG_SLIT_K'):
+def create_OB_telluric(name, sofi, folder_name='tmp', dit_acq=10, ndit_acq=1, dit=10, ndit=1, save=True, whichslit='long_slit_0.6', smode='LONG_SLIT_RED'):
     '''
     Create an OB for the telluric star.
     
@@ -665,8 +665,8 @@ def create_OB_telluric(name, sofi, folder_name='tmp', dit_acq=10, ndit_acq=1, di
     dit : float (default: 10)
     ndit : float (default: 1)
     save : bool (default: True)
-    whichslit : str (default: long_slit_1)
-    smode : str (default: LONG_SLIT_K)
+    whichslit : str (default: long_slit_0.6)
+    smode : str (default: LONG_SLIT_RED)
     '''
     ra, dec, pma, pmd = search_simbad(name)
     
