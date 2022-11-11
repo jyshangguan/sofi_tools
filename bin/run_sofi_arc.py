@@ -11,7 +11,7 @@ if not os.path.isdir(reduced_dir):
     os.makedirs(reduced_dir)
 
 pipe_path = os.environ['SOFIPIPELINE']
-calib_path = '{}/calib/sofi-1.5.13'.format(pipe_path)
+calib_path = '{}/calib'.format(pipe_path)
 
 arcList = run_reduction.find_arc_raw(work_path)
 arcsof = run_reduction.write_arc_sof(arcList, work_path, calib_path, reduced_dir)

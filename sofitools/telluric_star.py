@@ -64,7 +64,7 @@ def get_tell_star(row, result, star_pos, obstime = None,
         obstime = obstime + tm
 
     airmass = lasilla.altaz(obstime, targ).secz.value
-    print ("Target airmass at ",obstime.iso, ":", airmass)
+    #print ("Target airmass at ",obstime.iso, ":", airmass)
     
     tell_star = FixedTarget(coord=star_pos, name=None)
     tm = TimeDelta(0.5 * tobs * u.hour)
@@ -74,7 +74,7 @@ def get_tell_star(row, result, star_pos, obstime = None,
     airmass_star = lasilla.altaz(star_obstime, tell_star).secz.value
     d_airmass = np.abs(airmass_star-airmass)
     #print (star_obstime, tm)
-    print ("Telluric observed at ", star_obstime.iso)
+    #print ("Telluric observed at ", star_obstime.iso)
     
     result["sep"] = sep
     result["airmass"] = airmass_star
@@ -104,6 +104,7 @@ def get_tell_star(row, result, star_pos, obstime = None,
         
     return filtered[0], mstable, result
 
+
 def load_stars():
 
     qrstr = "dec<25  &  (sptype = 'A0V' | sptype = 'B0V' | sptype = 'B1V' |  sptype = 'B2V' | sptype = 'B3V') &  Kmag < 8"
@@ -113,6 +114,7 @@ def load_stars():
     star_pos = SkyCoord(result["RA"], result["DEC"], unit=(u.hourangle, u.deg))
     
     return result, star_pos
+
 
 def load_target(target_file, sheet_name=0):
     df = pd.read_excel(target_file, sheet_name=sheet_name) # removed skiprows
@@ -133,33 +135,47 @@ def simbad_search(id_str):
     spt_type = str_simbad[spt_st:spt_st+25]
     return basic_info, spt_type
 
-def telluric_search(name, obstime=None, tobs=None, show_max=5,  backup=False):
+
+def telluric_search(name, tdf, obstime=None, tobs=None, threshold_sep=30, show_max=5, return_list=False):
+    '''
+    Parameters
+    ----------
+    Name : string
+        Target name.
+    tdf : Pandas table
+        Target table.
+    obstime : Time
+        Observation time of the target.
+    tobs : float
+        Exposure time of the target.
+    show_max : int
+        Number of maximum telluric stars to return.
+    '''
     global result, star_pos, url
-    
-    if backup:
-        tdf =  back_df
-    else:
-        tdf = df
     
     select = (tdf["Name"] == name)
     row = tdf[select]
-    print (row)
     
-    ts, tb, rr = get_tell_star(row, result, star_pos, 
-                           obstime = obstime, tobs = tobs, data_path = None)
-    
-    for row in tb[0:show_max]:
-        try:
-            basic_info, spt_type = simbad_search(row["MAIN_ID"])
-            print ( basic_info, spt_type, "Sep:", row["sep"], "d_am:" , row["d_airmass"],  row["RA"], row["DEC"], row["airmass"])
-        except:
-            print (row["MAIN_ID"], "Sep", row["sep"], "d_am" , row["d_airmass"], row["RA"], row["DEC"], 
-                  row["airmass"])            
-    return 
+    ts, tb_org, rr = get_tell_star(row, result, star_pos, obstime = obstime, tobs = tobs, data_path = None)
+
+    if len(tb_org) == 0:
+        raise RuntimeError('Cannot find a CAL!')
+
+    tb = Table([tb_org['MAIN_ID'], np.round(tb_org['sep'], decimals=1), np.round(tb_org['d_airmass'], decimals=1),  
+                tb_org['RA'], tb_org['DEC']], names=['MAIN_ID', 'sep', 'd_airmass', 'RA', 'DEC'])
+    fltr = tb['sep'] < threshold_sep
+    tb = tb[fltr]
+    tb.sort(['d_airmass', 'sep'])
+
+    if return_list:
+        return tb[:show_max]
+    else:
+        return tb['MAIN_ID'][0], tb['sep'][0], tb['d_airmass'][0],  tb['RA'][0], tb['DEC'][0]
+
 
 result, star_pos = load_stars()
-#target_file = "tabs/target_final_sept2022_combined.xlsx"
-target_file = "tabs/target_tech_night.xlsx"
-#sheet_name = 1
-df = load_target(target_file)#, sheet_name=sheet_name)
-back_df = load_target("tabs/target_final_sept2022_add_backup_excel.xlsx")
+##target_file = "tabs/target_final_sept2022_combined.xlsx"
+#target_file = "tabs/target_tech_night.xlsx"
+##sheet_name = 1
+#df = load_target(target_file)#, sheet_name=sheet_name)
+#back_df = load_target("tabs/target_final_sept2022_add_backup_excel.xlsx")
