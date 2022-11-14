@@ -83,5 +83,12 @@ for k_fltr in sciDict:
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
             stdout, stderr = process.communicate()
+        
+        log_name = '{0}_esorex.log'.format(scisof[:-4])
+        if os.path.isfile('{0}/{1}/esorex.log'.format(work_path, reduced_dir)):
+            process = subprocess.Popen(['mv', '{0}/{1}/esorex.log'.format(work_path, reduced_dir), log_name],
+                         stdout=subprocess.PIPE, 
+                         stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
 
 os.system('mv {0}/*.paf {0}/{1}'.format(work_path, reduced_dir))
