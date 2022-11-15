@@ -26,8 +26,8 @@ parser.add_argument('-c', '--cal', required=True, dest='cal', type=str,
                     help='Telluric standard data')
 parser.add_argument('-t', '--type', default='A0V', dest='type', type=str, 
                     help='The stellar type of the telluric standard [A0V]')
-parser.add_argument('-p', '--plot', dest='plot', default=False, action='store_true',
-                    help='Plot the calibrated spectrum [False]')
+parser.add_argument('-p', '--plot', dest='plot', default=True, action='store_false',
+                    help='Plot the calibrated spectrum [True]')
 parser.add_argument('-r', '--redo', dest='redo', default=False, action='store_true',
                     help='Redo the calibration regardless whether the data exists [False]')
 parser.add_argument('--ncut', dest='ncut', default=20, type=int, 
