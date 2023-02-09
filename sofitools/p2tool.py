@@ -669,7 +669,10 @@ def create_OB_telluric(name, sofi, folder_name='tmp', dit_acq=10, ndit_acq=1, di
     smode : str (default: LONG_SLIT_K)
     '''
     ra, dec, pma, pmd = search_simbad(name)
-    
+
+    if name[0] == '*':
+        name = name[1:]
+        
     tell_name = name.replace(' ', '_')
     ob_name = 'telluric_{}'.format(tell_name)
     ob, obVersion = sofi.create_OB(ob_name, folder_name=folder_name, overwrite=True)
@@ -825,7 +828,7 @@ def spec_params(Kagn):
         ndit = 3
         nint = 2
         nabc = 8
-    elif (Kagn > 14.0) & (Kagn <= 16):  # 3.2 hour
+    elif (Kagn > 14.0) & (Kagn <= 16.5):  # 3.2 hour
         dit = 120
         ndit = 2
         nint = 1
