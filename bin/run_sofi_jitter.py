@@ -17,7 +17,7 @@ if not os.path.isdir(reduced_dir):
     os.makedirs(reduced_dir)
     
 pipe_path = os.environ['SOFIPIPELINE']
-calib_path = '{}/calib/sofi-1.5.13'.format(pipe_path)
+calib_path = '{}/calib'.format(pipe_path)
 sciDict = run_reduction.find_science_raw(work_path)
 
 esorex = '{}/bin/esorex'.format(pipe_path)
@@ -80,6 +80,13 @@ for k_fltr in sciDict:
         rec_name = '{0}_nodded_rec.fits'.format(scisof[:-4])
         if os.path.isfile('{0}/sofi_spc_jitter_nodded_rec.fits'.format(work_path)):
             process = subprocess.Popen(['mv', '{0}/sofi_spc_jitter_nodded_rec.fits'.format(work_path), rec_name],
+                         stdout=subprocess.PIPE, 
+                         stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+        
+        log_name = '{0}_esorex.log'.format(scisof[:-4])
+        if os.path.isfile('{0}/{1}/esorex.log'.format(work_path, reduced_dir)):
+            process = subprocess.Popen(['mv', '{0}/{1}/esorex.log'.format(work_path, reduced_dir), log_name],
                          stdout=subprocess.PIPE, 
                          stderr=subprocess.PIPE)
             stdout, stderr = process.communicate()

@@ -17,7 +17,7 @@ if not os.path.isdir(reduced_dir):
     os.makedirs(reduced_dir)
 
 pipe_path = os.environ['SOFIPIPELINE']
-calib_path = '{}/calib/sofi-1.5.13'.format(pipe_path)
+calib_path = '{}/calib'.format(pipe_path)
 sciDict = run_reduction.find_imscience_raw(work_path)
 
 esorex = '{}/bin/esorex'.format(pipe_path)
